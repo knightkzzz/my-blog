@@ -6,6 +6,7 @@ console.log(JSON.stringify(set_sidebar('web')));
 console.log(222); 
 
 export default defineConfig({
+  base: '/my-blog/',
   title: "KnightKzzz",
   description: "一个用于记录、学习、分享的博客网站",
   themeConfig: {
