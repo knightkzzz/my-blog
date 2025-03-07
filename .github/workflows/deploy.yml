@@ -1,0 +1,44 @@
+name: Deploy VitePress site to Pages
+
+on:
+  push:
+    branches: [main] # 当main分支收到推送时触发
+  workflow_dispatch: # 允许手动触发部署
+
+# 只允许同时进行一次部署
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整的git历史
+          
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+        
+      - name: Install dependencies
+        run: | 
+          npm install
+        
+      - name: Deploy
+        # https://github.com/JamesIves/github-pages-deploy-action
+        uses: JamesIves/github-pages-deploy-action@v4.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # 推送到哪个分支上
+          branch: gh-pages
+          # 推送哪个文件里的内容
+          folder: dist
+          # 是否强制提交
+          force: true
+          # 提交时候的 commit 消息
+          commit-message: website deploy
