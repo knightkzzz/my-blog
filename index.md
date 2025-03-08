@@ -7,7 +7,7 @@ hero:
   text: "博客为工作日常积累"
   tagline: 欢迎大家交流学习
   image:
-    src: /public/word.svg
+    src: /word.svg
     alt: 博客logo
   actions:
     - theme: brand
