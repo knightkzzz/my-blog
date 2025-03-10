@@ -38,10 +38,28 @@
     3. optimizeModules: 在优化模块后调用，可以用来进一步优化模块。
     4. optimizeChunks: 在优化chunks后调用，可以用来进一步优化chunks。
 
+---
+
 # 优化
 **主要是从打包、构建速度与包体积两个层面进行优化**
 - **构建速度**
 - **包体积**
-    1. TreeShaking<br>
-    2. Code Splitting<br>
-    3. 压缩<br>
+    1. **TreeShaking**<br>
+    触发条件：<br>
+                <span style="margin-left: 1em;">使用解构的方式导入包</span><br>
+                <span style="margin-left: 1em;">要导入的包必须是ESM规范，且采用export导出</span><br>
+                <span style="margin-left: 1em;">如果是单个文件的TreeShaking，在webpack中要开启production模式才能触发</span>
+    2. **Code Splitting**<br>
+    - 通过在optimization配置splitChunks进行代码分割，默认会分割node_modules中的包
+    - 分包时可以设置minSize,表示最小分割大小，当模块大于minSize时才会进行分割
+    - 分包时可以设置name,表示分包名称
+    - 分包时可以通过设置cacheGroups针对某个包进行单独分割，要注意的是cacheGroups会受到minSize的影响
+    - 举个例子你的minSize设置为300kb，分包名为common，打出的bundle为700kb，那么此时会分割成bundle.js和common.js,如果此时common.js大于300kb，那么就会针对于cacheGroups进行进一步分割，如果小于300kb，那么就不会进行分割
+    3. **压缩**<br>
+    - 在optimization配置minimize中开启
+    - 在optimization.minimizer中配置压缩的插件
+
+---
+
+# webpack-dev-server
+**webpack-dev-server是webpack的扩展，用于提供一个本地服务器，并自动刷新浏览器**
