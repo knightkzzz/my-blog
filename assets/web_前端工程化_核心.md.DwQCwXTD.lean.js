@@ -1,0 +1,1 @@
+import{_ as e,c as l,o,ae as a}from"./chunks/framework.DbnbUhgt.js";const p=JSON.parse('{"title":"解决的问题","description":"","frontmatter":{},"headers":[],"relativePath":"web/前端工程化/核心.md","filePath":"web/前端工程化/核心.md"}'),r={name:"web/前端工程化/核心.md"};function i(n,t,s,_,c,d){return o(),l("div",null,t[0]||(t[0]=[a("",7)]))}const m=e(r,[["render",i]]);export{p as __pageData,m as default};
