@@ -22,6 +22,23 @@
 
 # Loader
 **本质上是文件转换器，例如.vue文件、.ejs文件，自定义要处理的文件等**
+- 同步Loader直接返回处理过的content
+```js
+module.exports = function (content, map, meta) {
+  return someSyncOperation(content);
+};
+```
+- 异步Loader通过async返回callback对处理过的content进行返回
+```js
+module.exports = function (content, map, meta) {
+  var callback = this.async();
+  someAsyncOperation(content, function (err, result) {
+    if (err) return callback(err);
+    callback(null, result, map, meta);
+  });
+};
+```
+- 常用的Loader
 
 ---
 
