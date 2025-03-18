@@ -1,22 +1,43 @@
 # 核心概念
 - entry: 项目入口文件
 - output 输出bundle文件路径
-- module webpack在构建过程中的构建对象
+- module webpack在构建过程中的构建对象，及被loader处理过的文件
 - plugin 插件
 - loader 文件转换器
-- bundle 构建完成的产物
-- chunk 构建过程中的产物
+- bundle 构建完成的产物，及输出到目录的js文件
+- chunk 构建过程中的产物，及代码块，一个Chunk可以包含多个Module，若配置了文件分割，可能会生成多个Chunk
+- moduleGraph 模块依赖图，记录了模块之间的依赖关系
 
 ---
 
 # 构建主流程
-1. 初始化参数
-2. 开始编译
-3. 确定入口
-4. 编译模块
-5. 完成构建
-6. 输出结果
-
+  本质上webpack是一个壳，里面封装了各种内置插件以及定义了各种流程，webpack只是定义了一个流水线让插件可以按流程进行工作，各个插件完成具体的功能
+1. **初始化**
+  - 初始化Compiler
+  - 初始化options
+  - 调用外部插件
+  - 初始化环境environment
+  - 处理入口参数
+  - 加载内部插件
+  - 初始化查找器
+  - **标志初始化完毕hook --- initialize**
+2. 编译与构建
+  - **标志进入编译阶段hook --- run**
+  - 准备Compilation的参数(normalModuleFactory,contextModuleFactory)
+  - 创建Compilation，标志创建完成的hook --- compilation，标志一个新的Compilation触发hook --- watchRun
+  - **标志进入构建阶段hook --- make**
+  - 通过addEntry方法把入口添加到模块树中
+  - 根据模块类型通过normalModuleFactory或者contextModuleFactory生成Moudle对象
+  - 通过buildModule方法对模块进行构建，构建过程会调用loader对模块进行处理，将匹配到的文件转义一次，接着会调用parser对文件进行解析，生成AST，进行遍历转换，最后生成依赖关系，此过程会进行递归处理，最终完成所有模块的构建，形成ModuleGraph
+  - 标志构建完成的hook --- finishModules
+  - **标志进入封存阶段的hook --- seal,封存Compilation,生成chunk图**
+  - **标志进入优化阶段hook --- optimize,这一阶段对chunk以及Module进行优化**
+  - **进入代码生成阶段hook --- processAssets,这一阶段会计算Hash值以及根据chunk图生成代码块**
+3. 输出
+  - 标志编译与构建结束hook --- afterCompile
+  - **标志进入输出阶段hook --- emit,这里会循环输出每个资源**
+  - 标志输出资源到output目录hook --- afterEmit
+  - **标志输出完成hook --- done**
 ---
 
 
@@ -47,8 +68,10 @@ module.exports = function (content, map, meta) {
 1. 自定义插件常用的hooks
  -  **Compiler Hooks**
     1. emit: 在确定好文件输出内容后，将文件输出到output目录前触发。
-    2. compilation: 当一个新compilation创建时触发，compilation对象包含了当前的模块、编译生成资源、变化的文件等信息。
-    3. done: 在完成所有编译后触发，无论成功或失败。
+    2. afterEmit: 在文件输出到output目录后触发。
+    3. compilation: 当一个新compilation创建时触发，compilation对象包含了当前的模块、编译生成资源、变化的文件等信息。
+    4. watchRun: 在监听模式下，当出现一个新的Compilation时触发
+    5. done: 在完成所有编译后触发，无论成功或失败。
  -  **Compilation Hooks**
     1. optimize: 在优化步骤之前调用，可以用来分析或修改模块。
     2. processAssets:允许插件在生成文件到output目录前添加额外的资源。
